@@ -1,12 +1,13 @@
 # Address Book
 
 A CLI-based address book that can:
-  2. Add contacts with :
+
+  1. Add contacts with :
     a. First Name
     b. Last Name
     c. Address
     d. Phone Number
-  1. Search the contact based on :
+  2. Search the contact based on :
     a. Name
     b. Phone Number
 
