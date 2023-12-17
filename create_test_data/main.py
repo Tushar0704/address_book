@@ -3,12 +3,12 @@ import random
 import string
 
 
-def createTestData():
+def createTestData(total_number_of_entries):
 
     # Code to write  entries to a CSV file and each entry contains a
     # 5-7 letter first name, 5-7 letter last name, 10-20 letter address and a 10 digit phone number
-    with open("D:\PythonCodes\createTestData\self_created_mock_data_10000000.csv", "w") as test_csv_file:
-        for i in range(10000000):
+    with open("D:\PythonCodes\/test_data\self_created_mock_data_{}.csv".format(total_number_of_entries), "w") as test_csv_file:
+        for i in range(total_number_of_entries):
             first_name = ''.join(random.choice(string.ascii_lowercase) for _ in range(random.randint(5,7)))
             last_name = ''.join(random.choice(string.ascii_lowercase) for _ in range(random.randint(5,7)))
             address = ''.join(random.choice(string.ascii_lowercase) for _ in range(random.randint(10,20)))
@@ -20,7 +20,8 @@ def createTestData():
 if __name__ == "__main__":
     start_time = time.time()
 
-    createTestData()
+    # Call the function to create test data
+    createTestData(100)
 
     end_time = time.time()
     print("Time taken: ", end_time - start_time)

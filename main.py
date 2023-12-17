@@ -1,23 +1,23 @@
 import os
 import csv
 import time
-import pandas as pd
+import pandas as pd 
 
 
 # This function does a binary search on a given sorted list
-def binary_search(arr, low, high, x):
+def binary_search(arr, low, high, x, key=4):
     # Check base case
     if high >= low:
  
         mid = (high + low) // 2
  
         # If element is present at the middle itself
-        if arr[mid].strip().split(',')[4] == x:
+        if arr[mid].strip().split(',')[key] == x:
             return arr[mid]
  
         # If element is smaller than mid, then it can only
         # be present in left sub array
-        elif arr[mid].strip().split(',')[4] > x:
+        elif arr[mid].strip().split(',')[key] > x:
             return binary_search(arr, low, mid - 1, x)
  
         # Else the element can only be present in right subarray
@@ -26,6 +26,96 @@ def binary_search(arr, low, high, x):
     else:
         # Element is not present in the array
         return -1
+
+
+def add_ascii_values_of_first_and_last_name(first_name, last_name):
+    # Initializing the ascii value of the first name
+    name_ascii_value = ''
+
+    # Creating a full name by combining the first and last name
+    name = first_name.upper() + last_name.upper()   
+    
+    # Calculating the ascii value of the full name
+    for character in name:
+        name_ascii_value += str(ord(character))
+    
+    return name_ascii_value
+
+
+# This function goes through the input csv file and creates a folder
+# that contains multiple csv files with 1000000 records each and each file is sorted based on name
+# It returns the number of files created along with a dictionary that contains the first name of each file
+# along with the file name as key value pairs
+def sort_csv_based_on_names_and_create_multiple_csv_files(file_name, number_of_records_in_each_file=1000):
+
+    # Checking the time taken to sort the CSV file and create multiple files
+    sort_csv_based_on_names_and_create_multiple_files_started = time.time()
+
+    # Creating a dictionary that will contain the first full name of each file along with the file name as key value pairs
+    first_full_names = {}
+
+    # Initializing the file name to store the ascii values of the full name
+    file_name_with_ascii_value = file_name.replace('.csv', '_full_name.csv')
+
+    # Reading the CSV file and creating a new file with the ascii values of the full name
+    with open(file_name, "r") as original_contact_records_file:
+        with open(file_name_with_ascii_value, "w") as sorted_contact_records_file:
+            
+            # Creating a writer and reader object
+            writer = csv.writer(sorted_contact_records_file, lineterminator='\n')
+            reader = csv.reader(original_contact_records_file)
+
+            # Sorting the records based on full name
+            sorted_by_name = []
+
+            # Adding the ascii values of the first and last name to the records
+            for row in reader:
+                row.append(add_ascii_values_of_first_and_last_name(row[1], row[2]))
+                sorted_by_name.append(row)
+
+            # Writing the records with full name to a new file
+            writer.writerows(sorted_by_name)
+    
+
+    # Read the new file with the ascii values of the full name and sort it
+    with open(file_name_with_ascii_value, "r") as contact_records_file_with_ascii:
+        sorted_by_name = contact_records_file_with_ascii.readlines()
+
+    # Sorting the records based on full name
+    sorted_by_name.sort(key=lambda x: x.strip().split(",")[4])
+
+    # Writing the sorted records to a new file
+    with open(file_name.replace('.csv', '_sorted.csv'), "w") as sorted_contact_records_file:
+        sorted_contact_records_file.writelines(sorted_by_name)
+
+    # Calculating the number of files to be created
+    number_of_files = len(sorted_by_name) // number_of_records_in_each_file
+    if len(sorted_by_name) % number_of_records_in_each_file != 0:
+        number_of_files += 1
+
+    # Creating a folder to store the sorted names if it doesn't exist
+    if not os.path.exists(".\/names_csv"):
+        os.mkdir(".\/names_csv")
+
+    # Creating multiple files with number_of_records_in_each_file records each
+    for i in range(number_of_files):
+        file_name = ".\/names_csv\sorted_by_names_{}.csv".format(i+1)
+        first_full_names = { file_name: sorted_by_name[i*number_of_records_in_each_file].strip().split(",")[5] } | first_full_names
+        with open(file_name, "w") as sorted_names_file:
+            sorted_names_file.writelines(sorted_by_name[i*number_of_records_in_each_file:(i+1)*number_of_records_in_each_file])
+    
+    # Checking the time taken to sort the CSV file and create multiple files
+    sort_csv_based_on_names_and_create_multiple_files_ended = time.time()
+
+    # store the sorted full names in a file called index.txt
+    with open(".\/names_csv\index.txt", "w") as index_file:
+        index_file.write(str(first_full_names))
+
+    # Printing the time taken to sort the CSV file and create multiple files
+    print("Time taken to sort and create multiple files: ", sort_csv_based_on_names_and_create_multiple_files_ended - sort_csv_based_on_names_and_create_multiple_files_started)
+
+    # Returning the number of files created along with a dictionary that contains the first full name of each file along with the file name as key value pairs
+    return number_of_files, first_full_names, number_of_records_in_each_file
 
 
 # This function goes through the input csv file and creates a folder
@@ -194,19 +284,24 @@ def simple_read_with_name_and_phone():
 
 
 # This function does a binary search on the sorted phone numbers list
-def simple_binary_search_on_sorted_phone_numbers_csv(number_of_files, first_phone_numbers, number_of_records_in_each_file, number_to_search):
+def simple_binary_search_on_sorted_list_csv(number_of_files, index_file, number_of_records_in_each_file, search_text, search_by="phone"):
 
-    # Checking which file the phone number is in
-    for file_name in first_phone_numbers:
-        if first_phone_numbers[file_name] < number_to_search:
+    # Checking which file the phone number/name is in
+    for file_name in index_file:
+        if index_file[file_name] < search_text:
             break
     
     # Getting the sorted file
-    with open(file_name, "r") as sorted_phone_numbers_file:
-        sorted_records = sorted_phone_numbers_file.readlines()
+    with open(file_name, "r") as sorted_file:
+        sorted_records = sorted_file.readlines()
+
+    # Getting the index of the number/name
+    key = 4
+    if search_by == "name":
+        key = 5
        
-    # Doing a binary search on the sorted phone numbers
-    record = binary_search(sorted_records, 0, len(sorted_records) - 1, number_to_search)
+    # Doing a binary search on the sorted phone numbers/names
+    record = binary_search(sorted_records, 0, len(sorted_records) - 1, search_text, key)
 
     # Printing the record if found
     if record != -1:
@@ -215,6 +310,7 @@ def simple_binary_search_on_sorted_phone_numbers_csv(number_of_files, first_phon
         print("Record not found") 
 
     return record
+
 
 # This function does a binary search on the sorted phone numbers list
 def simple_binary_search_on_sorted_phone_numbers_txt(number_of_files, first_phone_numbers, number_of_records_in_each_file, number_to_search):
@@ -269,8 +365,11 @@ def run():
     # simple_read_with_name_and_phone()
     # sort_csv_based_on_phone()
 
-    number_of_files, first_phone_numbers, number_of_records_in_each_file = sort_csv_based_on_phone_and_create_multiple_csv_files(".\/test_data\self_created_mock_data_10000000.csv")
-    simple_binary_search_on_sorted_phone_numbers_csv(number_of_files, first_phone_numbers, number_of_records_in_each_file, number_to_search="9992066309")
+    # number_of_files, first_phone_numbers, number_of_records_in_each_file = sort_csv_based_on_phone_and_create_multiple_csv_files(".\/test_data\self_created_mock_data_10000000.csv")
+    # simple_binary_search_on_sorted_phone_numbers_csv(number_of_files, first_phone_numbers, number_of_records_in_each_file, number_to_search="9992066309")
+
+    number_of_files, first_phone_numbers, number_of_records_in_each_file = sort_csv_based_on_names_and_create_multiple_csv_files(".\/test_data\self_created_mock_data_100.csv")
+    simple_binary_search_on_sorted_list_csv(number_of_files, first_phone_numbers, number_of_records_in_each_file, search_text="TusharAgarwal", search_by="name")
 
     # number_of_files, first_phone_numbers, number_of_records_in_each_file = sort_csv_based_on_phone_and_create_multiple_txt_files(".\/test_data\self_created_mock_data_10000000.csv")
     # simple_binary_search_on_sorted_phone_numbers_txt(number_of_files, first_phone_numbers, number_of_records_in_each_file, number_to_search="8141012184")

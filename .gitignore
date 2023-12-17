@@ -6,6 +6,7 @@ __pycache__/
 # Files
 *.csv
 test_data/
+names_csv/
 phone_numbers/
 phone_numbers_csv/
 
