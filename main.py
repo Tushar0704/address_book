@@ -1,5 +1,7 @@
 import os
+import csv
 import time
+import pandas as pd
 
 
 # This function does a binary search on a given sorted list
@@ -10,12 +12,12 @@ def binary_search(arr, low, high, x):
         mid = (high + low) // 2
  
         # If element is present at the middle itself
-        if arr[mid] == x:
-            return mid
+        if arr[mid].strip().split(',')[4] == x:
+            return arr[mid]
  
         # If element is smaller than mid, then it can only
-        # be present in left subarray
-        elif arr[mid] > x:
+        # be present in left sub array
+        elif arr[mid].strip().split(',')[4] > x:
             return binary_search(arr, low, mid - 1, x)
  
         # Else the element can only be present in right subarray
@@ -30,9 +32,59 @@ def binary_search(arr, low, high, x):
 # that contains multiple csv files with 1000000 records each and each file is sorted based on phone numbers
 # It returns the number of files created along with a dictionary that contains the first phone number of each file
 # along with the file name as key value pairs
-def sort_csv_based_on_phone_and_create_multiple_files(file_name, number_of_records_in_each_file=1000):
+def sort_csv_based_on_phone_and_create_multiple_csv_files(file_name, number_of_records_in_each_file=1000):
     # Checking the time taken to sort the CSV file and create multiple files
     sort_csv_based_on_phone_and_create_multiple_files_started = time.time()
+
+    # Creating a dictionary that will contain the first phone number of each file along with the file name as key value pairs
+    first_phone_numbers = {}
+
+    # Reading the CSV file
+    with open(file_name, "r") as original_contact_records_file:
+        contact_records = original_contact_records_file.readlines()
+
+    # Sorting the records based on phone number
+    contact_records.sort(key=lambda x: x.strip().split(",")[4])
+
+    # Writing the sorted records to a new file
+    with open(file_name.replace('.csv', '_sorted.csv'), "w") as sorted_contact_records_file:
+        sorted_contact_records_file.writelines(contact_records)
+    
+    # Calculating the number of files to be created
+    number_of_files = len(contact_records) // number_of_records_in_each_file
+    if len(contact_records) % number_of_records_in_each_file != 0:
+        number_of_files += 1
+
+    # Creating a folder to store the sorted phone numbers if it doesn't exist
+    if not os.path.exists(".\phone_numbers_csv"):
+        os.mkdir(".\phone_numbers_csv")
+
+    # Creating multiple files with number_of_records_in_each_file records each
+    for i in range(number_of_files):
+        file_name = ".\phone_numbers_csv\sorted_by_phone_numbers_{}.csv".format(i+1)
+        first_phone_numbers = { file_name: contact_records[i*number_of_records_in_each_file].strip().split(",")[4] } | first_phone_numbers
+        with open(file_name, "w") as sorted_phone_numbers_file:
+            sorted_phone_numbers_file.writelines(contact_records[i*number_of_records_in_each_file:(i+1)*number_of_records_in_each_file])
+    
+    # Checking the time taken to sort the CSV file and create multiple files
+    sort_csv_based_on_phone_and_create_multiple_files_ended = time.time()
+
+    # store the sorted phone numbers in a file called index.txt
+    with open(".\phone_numbers_csv\index.txt", "w") as index_file:
+        index_file.write(str(first_phone_numbers))
+
+    # Printing the time taken to sort the CSV file and create multiple files
+    print("Time taken to sort and create multiple files: ", sort_csv_based_on_phone_and_create_multiple_files_ended - sort_csv_based_on_phone_and_create_multiple_files_started)
+
+    # Returning the number of files created along with a dictionary that contains the first phone number of each file along with the file name as key value pairs
+    return number_of_files, first_phone_numbers, number_of_records_in_each_file
+
+
+# This function goes through the input csv file and creates a folder
+# that contains multiple csv files with 1000000 records each and each file is sorted based on phone numbers
+# It returns the number of files created along with a dictionary that contains the first phone number of each file
+# along with the file name as key value pairs
+def sort_csv_based_on_phone_and_create_multiple_txt_files(file_name, number_of_records_in_each_file=1000):
 
     # Creating a dictionary that will contain the first phone number of each file along with the file name as key value pairs
     first_phone_numbers = {}
@@ -70,15 +122,12 @@ def sort_csv_based_on_phone_and_create_multiple_files(file_name, number_of_recor
         with open(file_name, "w") as sorted_phone_numbers_file:
             sorted_phone_numbers_file.writelines('\n'.join(sorted_phone_numbers[i*number_of_records_in_each_file:(i+1)*number_of_records_in_each_file]))
     
-    # Checking the time taken to sort the CSV file and create multiple files
-    sort_csv_based_on_phone_and_create_multiple_files_ended = time.time()
-
     # store the sorted phone numbers in a file called index.txt
     with open(".\phone_numbers\index.txt", "w") as index_file:
         index_file.write(str(first_phone_numbers))
 
-    # Printing the time taken to sort the CSV file and create multiple files
-    print("Time taken to sort and create multiple files: ", sort_csv_based_on_phone_and_create_multiple_files_ended - sort_csv_based_on_phone_and_create_multiple_files_started)
+    # Printing that the files have been created
+    print("The file has been sorted and multiple files have been created")
 
     # Returning the number of files created along with a dictionary that contains the first phone number of each file along with the file name as key value pairs
     return number_of_files, first_phone_numbers, number_of_records_in_each_file
@@ -90,14 +139,14 @@ def sort_csv_based_on_phone():
     # Checking the time taken to sort the CSV file
     sort_started = time.time()
 
-    with open(".\create_test_data\self_created_mock_data_10000000.csv", "r") as test_csv_file:
+    with open(".\/test_data\self_created_mock_data_10000000.csv", "r") as test_csv_file:
         contact_records = test_csv_file.readlines()
     
     # Sorting the records based on phone number
     contact_records.sort(key=lambda x: x.strip().split(",")[4])
     
     # Writing the sorted records to a new file
-    with open(".\create_test_data\self_created_mock_data_10000000.csv", "w") as sorted_csv_file:
+    with open(".\/test_data\self_created_mock_data_10000000.csv", "w") as sorted_csv_file:
         sorted_csv_file.writelines(contact_records)
     
     # Creating an array of sorted phone numbers
@@ -145,7 +194,30 @@ def simple_read_with_name_and_phone():
 
 
 # This function does a binary search on the sorted phone numbers list
-def simple_binary_search_on_sorted_phone_numbers(number_of_files, first_phone_numbers, number_of_records_in_each_file, number_to_search):
+def simple_binary_search_on_sorted_phone_numbers_csv(number_of_files, first_phone_numbers, number_of_records_in_each_file, number_to_search):
+
+    # Checking which file the phone number is in
+    for file_name in first_phone_numbers:
+        if first_phone_numbers[file_name] < number_to_search:
+            break
+    
+    # Getting the sorted file
+    with open(file_name, "r") as sorted_phone_numbers_file:
+        sorted_records = sorted_phone_numbers_file.readlines()
+       
+    # Doing a binary search on the sorted phone numbers
+    record = binary_search(sorted_records, 0, len(sorted_records) - 1, number_to_search)
+
+    # Printing the record if found
+    if record != -1:
+        print("Found the record: ", record)
+    else:
+        print("Record not found") 
+
+    return record
+
+# This function does a binary search on the sorted phone numbers list
+def simple_binary_search_on_sorted_phone_numbers_txt(number_of_files, first_phone_numbers, number_of_records_in_each_file, number_to_search):
 
     # Checking the time taken to read the sorted phone numbers
     simple_binary_search_on_sorted_phone_numbers_started = time.time()
@@ -170,10 +242,14 @@ def simple_binary_search_on_sorted_phone_numbers(number_of_files, first_phone_nu
     simple_binary_search_on_sorted_phone_numbers_ended = time.time()
     
     # Getting the record from the CSV file
-    with open(".\create_test_data\self_created_mock_data_10000000_sorted.csv", "r") as test_csv_file:
+    with open(".\/test_data\self_created_mock_data_10000000_sorted.csv", "r") as test_csv_file:
         contact_records = test_csv_file.readlines()
     
+    # Getting the record
     record = contact_records[correct_index].strip().split(",")
+
+    # df = pd.read_csv('.\/test_data\self_created_mock_data_10000000_sorted.csv')
+    # record = df.loc[[correct_index],:]
 
     file_ended = time.time()
 
@@ -192,8 +268,12 @@ def run():
     # simple_read()
     # simple_read_with_name_and_phone()
     # sort_csv_based_on_phone()
-    number_of_files, first_phone_numbers, number_of_records_in_each_file = sort_csv_based_on_phone_and_create_multiple_files(".\create_test_data\self_created_mock_data_10000000.csv")
-    simple_binary_search_on_sorted_phone_numbers(number_of_files, first_phone_numbers, number_of_records_in_each_file, number_to_search="8141012184")
+
+    number_of_files, first_phone_numbers, number_of_records_in_each_file = sort_csv_based_on_phone_and_create_multiple_csv_files(".\/test_data\self_created_mock_data_10000000.csv")
+    simple_binary_search_on_sorted_phone_numbers_csv(number_of_files, first_phone_numbers, number_of_records_in_each_file, number_to_search="9992066309")
+
+    # number_of_files, first_phone_numbers, number_of_records_in_each_file = sort_csv_based_on_phone_and_create_multiple_txt_files(".\/test_data\self_created_mock_data_10000000.csv")
+    # simple_binary_search_on_sorted_phone_numbers_txt(number_of_files, first_phone_numbers, number_of_records_in_each_file, number_to_search="8141012184")
 
 
 if __name__ == "__main__":

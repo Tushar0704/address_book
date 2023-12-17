@@ -7,6 +7,7 @@ __pycache__/
 *.csv
 test_data/
 phone_numbers/
+phone_numbers_csv/
 
 # C extensions
 *.so
