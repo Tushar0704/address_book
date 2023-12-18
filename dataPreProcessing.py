@@ -32,17 +32,18 @@ def data_pre_processing(file_name, number_of_records_in_each_file=1000):
             writer = csv.writer(contact_records_file_with_full_name, lineterminator='\n')
             reader = csv.reader(original_contact_records_file)
 
-            # # All records to store all the records converted in ascii
-            # all_records = []
-
             # Adding the ascii values of the first and last name to the records
             for row in reader:
                 row.append(add_ascii_values_of_first_and_last_name(row[1], row[2]))
                 writer.writerow(row)
-
-            # # Writing the records with full name to a new file
-            # writer.writerows(all_records)
     
+    # Creating a folder to store the sorted names if it doesn't exist
+    if not os.path.exists(".\/full_names_csv"):
+        os.mkdir(".\/full_names_csv")
+    
+    # Creating a folder to store the sorted phone numbers if it doesn't exist
+    if not os.path.exists(".\/phone_numbers_csv"):
+        os.mkdir(".\/phone_numbers_csv")
 
     # Reading the entire file with full name converted into ascii again
     records_with_full_name = []
@@ -57,25 +58,17 @@ def data_pre_processing(file_name, number_of_records_in_each_file=1000):
     records_with_full_name.sort(key=lambda x: x.strip().split(",")[5])
 
     # Writing the sorted records to a new file
-    with open(file_name_of_file_with_full_name.replace('.csv', '_sorted_by_full_name.csv'), "w") as sorted_by_full_name_contact_records_file:
+    with open('.\/full_names_csv\sorted_by_full_names.csv', "w") as sorted_by_full_name_contact_records_file:
         sorted_by_full_name_contact_records_file.writelines(records_with_full_name)
 
     # Writing the sorted records to a new file
-    with open(file_name_of_file_with_full_name.replace('.csv', '_sorted_by_phone_numbers.csv'), "w") as sorted_by_phone_numbers_contact_records_file:
+    with open('.\/full_names_csv\sorted_by_phone_numbers.csv', "w") as sorted_by_phone_numbers_contact_records_file:
         sorted_by_phone_numbers_contact_records_file.writelines(records_sorted_by_phone_numbers)
     
     # Calculating the number of files to be created
     number_of_files = len(records_with_full_name) // number_of_records_in_each_file
     if len(records_with_full_name) % number_of_records_in_each_file != 0:
         number_of_files += 1
-    
-    # Creating a folder to store the sorted names if it doesn't exist
-    if not os.path.exists(".\/full_names_csv"):
-        os.mkdir(".\/full_names_csv")
-    
-    # Creating a folder to store the sorted phone numbers if it doesn't exist
-    if not os.path.exists(".\/phone_numbers_csv"):
-        os.mkdir(".\/phone_numbers_csv")
     
     # Creating multiple files with number_of_records_in_each_file records each
     for i in range(number_of_files):
