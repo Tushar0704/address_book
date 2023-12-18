@@ -8,6 +8,7 @@ __pycache__/
 test_data/
 names_csv/
 phone_numbers/
+full_names_csv/
 phone_numbers_csv/
 
 # C extensions
