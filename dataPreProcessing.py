@@ -62,7 +62,7 @@ def data_pre_processing(file_name, number_of_records_in_each_file=1000):
         sorted_by_full_name_contact_records_file.writelines(records_with_full_name)
 
     # Writing the sorted records to a new file
-    with open('.\/full_names_csv\sorted_by_phone_numbers.csv', "w") as sorted_by_phone_numbers_contact_records_file:
+    with open('.\/phone_numbers_csv\sorted_by_phone_numbers.csv', "w") as sorted_by_phone_numbers_contact_records_file:
         sorted_by_phone_numbers_contact_records_file.writelines(records_sorted_by_phone_numbers)
     
     # Calculating the number of files to be created

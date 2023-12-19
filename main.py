@@ -376,11 +376,8 @@ def run():
     # number_of_files, first_phone_numbers, number_of_records_in_each_file = sort_csv_based_on_phone_and_create_multiple_csv_files(".\/test_data\self_created_mock_data_10000000.csv")
     # simple_binary_search_on_sorted_phone_numbers_csv(number_of_files, first_phone_numbers, number_of_records_in_each_file, number_to_search="9992066309")
 
-    number_of_files, phone_numbers_of_first_element, full_names_of_first_element = data_pre_processing("D:\PythonCodes\/test_data\self_created_mock_data_100.csv", 1000)
-
-    ascii_value_to_search = add_ascii_values_of_first_and_last_name("zipvpy", "dzeewrm")
-    print(ascii_value_to_search)
-
+    number_of_files, phone_numbers_of_first_element, full_names_of_first_element = data_pre_processing("D:\PythonCodes\/test_data\self_created_mock_data_10000000.csv", 1000)
+    ascii_value_to_search = add_ascii_values_of_first_and_last_name("Tushar", "Agarwal")
     record = search_the_address_book(phone_numbers_of_first_element, full_names_of_first_element, ascii_value_to_search, search_by="full_names")
 
     # number_of_files, first_phone_numbers, number_of_records_in_each_file = sort_csv_based_on_phone_and_create_multiple_txt_files(".\/test_data\self_created_mock_data_10000000.csv")
