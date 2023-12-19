@@ -39,7 +39,7 @@ Options Available:
 
 Upon starting, you'll be presented with several options:
 1. Input the file path: To add a new CSV file.
-2. Search based on name: To search for contacts by their names.
+2. Search based on name: Search for contacts by their names.
 3. Search based on phone number: To search for contacts by their phone numbers.
 0. Exit: To close the address book.
 Inputting a File:
@@ -52,7 +52,7 @@ Once processed, the address book will display a message indicating success.
 
 Choose option 2.
 Searching by Name:
-Enter the first name and last name of the contact you wish to find.
+Enter the first and last names of the contact you wish to find.
 The address book will search for the contact and display the results if found.
 
 
@@ -66,8 +66,11 @@ Exiting the Address Book:
 Choose option 0.
 You'll see a goodbye message, and the address book will close.
 
+
+## Test Data
+There is a folder, create_test_data that contains a script to create test data for testing purposes.
+
 <br>
 Notes:
-Ensure you have the necessary permissions to read from the CSV file and execute the script.
 For large CSV files, be patient during the preprocessing phase.
 Make sure to enter accurate names or phone numbers for searching to get the desired results.
