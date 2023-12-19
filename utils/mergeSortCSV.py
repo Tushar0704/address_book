@@ -25,17 +25,21 @@ def merge_sorted_files(temporary_files, output_file, key):
 
 
 def merge_sort_csv(input_file, output_file, chunk_size, key = 4):
+
+    # Step 0: If temp_chunk_csv folder doesn't exists then create it.
+    if not os.path.exists(".\/temp_chunk_csv"):
+        os.mkdir(".\/temp_chunk_csv")
+
     # Step 1: Split the CSV file into sorted chunks
     temp_files = []
     with open(input_file, 'r') as f:
-        reader = csv.reader(f)
         i = 0
         while True:
             chunk = list(csv.reader(islice(f, chunk_size)))
             if not chunk:
                 break
             chunk.sort(key=lambda x: int(x[key]))  # Sort each chunk using built-in Python sort
-            temp_file = f'temp_chunk_{i}.csv'
+            temp_file = f'.\/temp_chunk_csv/temp_chunk_{i}.csv'
             with open(temp_file, 'w', newline='') as temp:
                 writer = csv.writer(temp)
                 writer.writerows(chunk)

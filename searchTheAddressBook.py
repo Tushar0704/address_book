@@ -27,9 +27,6 @@ def search_the_address_book(phone_numbers_of_first_element, full_names_of_first_
     with open(file_name_record_is_present, "r") as file_in_which_records_are:
         sorted_records = file_in_which_records_are.readlines()
     
-    print(len(sorted_records))
-    print(file_name_record_is_present)
-    
     # Doing a binary search on the sorted phone numbers/names
     record = binary_search(sorted_records, 0, len(sorted_records) - 1, search_text, key)
 

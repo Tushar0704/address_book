@@ -1,6 +1,5 @@
 import os
 import csv
-import time
 
 from utils.mergeSortCSV import merge_sort_csv
 from utils.splitFileIntoChunks import split_file_into_chunks
@@ -14,10 +13,7 @@ from utils.covertFullnameToAscii import add_ascii_values_of_first_and_last_name
 # This file then returns two dictionary each containing the file name and first element of each smaller 
 # chunk file as ke-pair values, so the we only have to search one file.
 
-def data_pre_processing(file_name, number_of_records_in_each_file=1000):
-
-    # Checking the time it takes to pre-process the entire file and divide it in smaller chunks
-    data_pre_processing_started = time.time()
+def data_pre_processing(file_name, number_of_files_to_split_data_in = 1000):
 
     # Creating a dictionaries that will contain the full name of first element of each file and 
     # phone numbers of the first element of each file along with the file name as key value pairs
@@ -43,6 +39,13 @@ def data_pre_processing(file_name, number_of_records_in_each_file=1000):
                 total_number_of_Records += 1
                 row.append(add_ascii_values_of_first_and_last_name(row[1], row[2]))
                 writer.writerow(row)
+    
+
+    # Counting the number of records in each file:
+    if number_of_files_to_split_data_in < total_number_of_Records:
+        number_of_records_in_each_file = int(total_number_of_Records / number_of_files_to_split_data_in)
+    else:
+        number_of_records_in_each_file = total_number_of_Records
     
     # Creating a folder to store the sorted names if it doesn't exist
     if not os.path.exists(".\/full_names_csv"):
@@ -74,12 +77,6 @@ def data_pre_processing(file_name, number_of_records_in_each_file=1000):
     # store the sorted full names in a file called index.txt
     with open(".\/phone_numbers_csv\index.txt", "w") as index_file:
         index_file.write(str(phone_numbers_of_first_element))
-        
-    # Checking the time taken to pre-process the entire data
-    data_pre_processing_ended = time.time()
-
-    # Printing the time taken to pre-process the entire data
-    print("Time taken to pre-process the entire data: ", data_pre_processing_ended - data_pre_processing_started)
 
     # Returning the index files
-    return number_of_files, phone_numbers_of_first_element, full_names_of_first_element
+    return phone_numbers_of_first_element, full_names_of_first_element

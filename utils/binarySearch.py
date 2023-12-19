@@ -1,5 +1,4 @@
 # This function does a binary search on a given sorted csv file.
-
 def binary_search(arr, low, high, x, key=4):
 
     # Check base case
