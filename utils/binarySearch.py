@@ -8,12 +8,12 @@ def binary_search(arr, low, high, x, key=4):
         mid = (high + low) // 2
  
         # If element is present at the middle itself
-        if arr[mid].strip().split(',')[key] == x:
+        if int(arr[mid].strip().split(',')[key]) == int(x):
             return arr[mid]
  
         # If element is smaller than mid, then it can only
         # be present in left sub array
-        elif arr[mid].strip().split(',')[key] > x:
+        elif int(arr[mid].strip().split(',')[key]) > int(x):
             return binary_search(arr, low, mid - 1, x, key)
  
         # Else the element can only be present in right sub array

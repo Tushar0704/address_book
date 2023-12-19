@@ -1,6 +1,9 @@
 import os
 import csv
 import time
+
+from utils.mergeSortCSV import merge_sort_csv
+from utils.splitFileIntoChunks import split_file_into_chunks
 from utils.covertFullnameToAscii import add_ascii_values_of_first_and_last_name
 
 # This function goes through the entire address book file and then add another column that contains the
@@ -21,6 +24,9 @@ def data_pre_processing(file_name, number_of_records_in_each_file=1000):
     full_names_of_first_element = {}
     phone_numbers_of_first_element = {}
 
+    # Initializing the total number of records in the file
+    total_number_of_Records = 0
+
     # Initializing the file name for the file we want to store along with the new ascii column
     file_name_of_file_with_full_name = file_name.replace('.csv', '_with_full_name.csv')
 
@@ -34,6 +40,7 @@ def data_pre_processing(file_name, number_of_records_in_each_file=1000):
 
             # Adding the ascii values of the first and last name to the records
             for row in reader:
+                total_number_of_Records += 1
                 row.append(add_ascii_values_of_first_and_last_name(row[1], row[2]))
                 writer.writerow(row)
     
@@ -45,45 +52,21 @@ def data_pre_processing(file_name, number_of_records_in_each_file=1000):
     if not os.path.exists(".\/phone_numbers_csv"):
         os.mkdir(".\/phone_numbers_csv")
 
-    # Reading the entire file with full name converted into ascii again
-    records_with_full_name = []
-    with open(file_name_of_file_with_full_name, "r") as contact_records_file_with_ascii:
-        records_with_full_name = contact_records_file_with_ascii.readlines()
-    
-    # Assigning it to another variable for phone numbers
-    records_with_full_name.sort(key=lambda x: x.strip().split(",")[4])
-    records_sorted_by_phone_numbers = records_with_full_name
-
-    # Sorting the records_with_full_name by full_name
-    records_with_full_name.sort(key=lambda x: x.strip().split(",")[5])
-
-    # Writing the sorted records to a new file
-    with open('.\/full_names_csv\sorted_by_full_names.csv', "w") as sorted_by_full_name_contact_records_file:
-        sorted_by_full_name_contact_records_file.writelines(records_with_full_name)
-
-    # Writing the sorted records to a new file
-    with open('.\/phone_numbers_csv\sorted_by_phone_numbers.csv', "w") as sorted_by_phone_numbers_contact_records_file:
-        sorted_by_phone_numbers_contact_records_file.writelines(records_sorted_by_phone_numbers)
+    # Sorting the file with full name based on full name and on based of phone_numbers
+    merge_sort_csv(file_name_of_file_with_full_name, '.\/full_names_csv\sorted_by_full_names.csv', number_of_records_in_each_file, 5)
+    merge_sort_csv(file_name_of_file_with_full_name, '.\/phone_numbers_csv\sorted_by_phone_numbers.csv', number_of_records_in_each_file, 4)
     
     # Calculating the number of files to be created
-    number_of_files = len(records_with_full_name) // number_of_records_in_each_file
-    if len(records_with_full_name) % number_of_records_in_each_file != 0:
+    number_of_files = total_number_of_Records // number_of_records_in_each_file
+    if total_number_of_Records % number_of_records_in_each_file != 0:
         number_of_files += 1
-    
-    # Creating multiple files with number_of_records_in_each_file records each
-    for i in range(number_of_files):
-        file_name_for_full_names = ".\/full_names_csv\sorted_by_full_names_{}.csv".format(i+1)
-        full_names_of_first_element = { file_name_for_full_names: records_with_full_name[i*number_of_records_in_each_file].strip().split(",")[5] } | full_names_of_first_element
 
-        file_name_for_phone_numbers = ".\/phone_numbers_csv\sorted_by_phone_numbers_{}.csv".format(i+1)
-        phone_numbers_of_first_element = { file_name_for_phone_numbers: records_sorted_by_phone_numbers[i*number_of_records_in_each_file].strip().split(",")[4] } | phone_numbers_of_first_element
+    # Splitting the sorted_by_full_names csv file into smaller chunks
+    full_names_of_first_element = split_file_into_chunks('.\/full_names_csv\sorted_by_full_names.csv', '.\/full_names_csv\sorted_by_full_names_', number_of_records_in_each_file, 5)
 
-        with open(file_name_for_full_names, "w") as sorted_by_name_file:
-            sorted_by_name_file.writelines(records_with_full_name[i*number_of_records_in_each_file:(i+1)*number_of_records_in_each_file])
-        
-        with open(file_name_for_phone_numbers, "w") as sorted_by_phone_number:
-            sorted_by_phone_number.writelines(records_sorted_by_phone_numbers[i*number_of_records_in_each_file:(i+1)*number_of_records_in_each_file])
-    
+    # Splitting the sorted_by_phone_numbers csv file into smaller chunks
+    phone_numbers_of_first_element = split_file_into_chunks('.\/phone_numbers_csv\sorted_by_phone_numbers.csv', '.\/phone_numbers_csv\sorted_by_phone_numbers_', number_of_records_in_each_file, 4)
+
     # store the sorted full names in a file called index.txt
     with open(".\/full_names_csv\index.txt", "w") as index_file:
         index_file.write(str(full_names_of_first_element))

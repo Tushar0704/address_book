@@ -20,12 +20,15 @@ def search_the_address_book(phone_numbers_of_first_element, full_names_of_first_
 
     # Now out all the smaller chunks, checking which smaller chunk contains our record
     for file_name_record_is_present in index_file_to_search_in:
-        if index_file_to_search_in[file_name_record_is_present] < search_text:
+        if int(index_file_to_search_in[file_name_record_is_present]) < int(search_text):
             break
-        
+    
     # Getting the content of the file names
     with open(file_name_record_is_present, "r") as file_in_which_records_are:
         sorted_records = file_in_which_records_are.readlines()
+    
+    print(len(sorted_records))
+    print(file_name_record_is_present)
     
     # Doing a binary search on the sorted phone numbers/names
     record = binary_search(sorted_records, 0, len(sorted_records) - 1, search_text, key)
